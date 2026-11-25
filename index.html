@@ -2,7 +2,7 @@
 <html lang="ko"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>주식 분석 대시보드</title>
+<title>글로벌 주식 분석 대시보드</title>
 <style>
 body{margin:0;font-family:"Noto Sans KR",system-ui,sans-serif;background:#fafafa;color:#222;line-height:1.6}
 main{max-width:960px;margin:0 auto;padding:16px}
@@ -19,7 +19,7 @@ main{max-width:960px;margin:0 auto;padding:16px}
 .st-p{font-size:.98rem;line-height:1.7;margin:0 0 12px}
 .st-btn{display:inline-block;padding:10px 18px;border-radius:12px;background:var(--st-accent);color:#fff!important;text-decoration:none;font-weight:700;font-size:.92rem;line-height:1.2;border:0;cursor:pointer;margin-top:12px;text-align:center}
 .st-btn:hover{filter:brightness(1.08)}
-.st-hero{text-align:center;padding:28px 20px;border-radius:20px;background:#f6f6f6;background:color-mix(in srgb,var(--st-accent) 10%,#fff)}
+.st-hero{text-align:center;padding:26px 20px;border-radius:20px;background:#f6f6f6;background:color-mix(in srgb,var(--st-accent) 10%,#fff)}
 .st-hero .st-h{font-size:1.75rem}
 .st-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
 .st-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:left;display:flex;flex-direction:column;justify-content:space-between}
@@ -33,13 +33,40 @@ main{max-width:960px;margin:0 auto;padding:16px}
 @media(hover:hover){.st-hv-lift:hover{translate:0 -5px;box-shadow:0 12px 24px rgba(0,0,0,.12)}}
 .st-hv-press:active{scale:.96}
 .st-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--st-accent) 15%,#fff);color:var(--st-accent);margin-bottom:6px}
-.live-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden}
-.live-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+
+/* 글로벌 검색 및 차트 패널 */
+.live-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:visible}
+.live-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.sym-btns{display:flex;gap:6px;flex-wrap:wrap}
+
+.search-wrap{position:relative;margin-bottom:12px}
+.search-bar{display:flex;gap:8px;flex-wrap:wrap}
+.search-input{flex:1 1 240px;padding:11px 14px;border:1.5px solid rgba(0,0,0,.18);border-radius:12px;font:inherit;font-size:.95rem;background:#fff;color:#222}
+.search-input:focus{outline:2px solid var(--st-accent);border-color:var(--st-accent)}
+.search-submit{padding:10px 18px;border-radius:12px;border:0;background:var(--st-accent);color:#fff;font:inherit;font-weight:700;font-size:.92rem;cursor:pointer}
+.search-submit:hover{filter:brightness(1.06)}
+.fav-btn{padding:10px 14px;border-radius:12px;border:1.5px solid rgba(0,0,0,.15);background:#fff;color:#333;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
+.fav-btn.is-fav{border-color:#f59e0b;background:#fffbeb;color:#b45309}
+
+/* 자동완성 드롭다운 */
+.ac-list{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:100;background:#fff;border:1px solid rgba(0,0,0,.14);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.15);max-height:320px;overflow-y:auto;display:none}
+.ac-list.is-open{display:block}
+.ac-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;text-align:left}
+.ac-item:last-child{border-bottom:0}
+.ac-item:hover,.ac-item.is-active{background:color-mix(in srgb,var(--st-accent) 8%,#fff)}
+.ac-main{display:flex;flex-direction:column;min-width:0}
+.ac-name{font-weight:700;font-size:.94rem;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-sub{font-size:.78rem;color:#666}
+.ac-tag{flex:none;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:#f1f3f5;color:#333}
+.ac-status{padding:12px 14px;font-size:.86rem;color:#666;text-align:center}
+
+.sym-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.sym-label{font-size:.8rem;font-weight:700;color:#666;margin-right:4px}
 .sym-btn{padding:6px 12px;border-radius:999px;border:1px solid rgba(0,0,0,.15);background:#fff;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;color:#333}
 .sym-btn.is-on{background:var(--st-accent);color:#fff;border-color:var(--st-accent)}
+.search-hint{font-size:.8rem;color:#666;margin:0 0 12px}
+.active-sym{font-size:.88rem;font-weight:700;color:var(--st-accent)}
 </style></head>
 <body>
 
@@ -54,7 +81,7 @@ main{max-width:960px;margin:0 auto;padding:16px}
     </div>
   </nav>
 
-  <!-- 1. 상단 실시간 주요 지수·종목 전광판 (Ticker Tape) -->
+  <!-- 1. 상단 실시간 글로벌 주요 지수·종목 전광판 -->
   <div style="background:#fff;border-bottom:1px solid rgba(0,0,0,.08);">
     <div class="tradingview-widget-container" style="max-width:960px;margin:0 auto;">
       <div class="tradingview-widget-container__widget"></div>
@@ -65,6 +92,7 @@ main{max-width:960px;margin:0 auto;padding:16px}
           { "proName": "KRX:KOSDAQ", "title": "코스닥" },
           { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
           { "proName": "NASDAQ:NDX", "title": "나스닥 100" },
+          { "proName": "INDEX:NKY", "title": "닛케이 225" },
           { "proName": "FX_IDC:USDKRW", "title": "원/달러 환율" },
           { "proName": "KRX:005930", "title": "삼성전자" },
           { "proName": "NASDAQ:NVDA", "title": "엔비디아" }
@@ -82,31 +110,63 @@ main{max-width:960px;margin:0 auto;padding:16px}
   <main>
     <!-- 히어로 소개 영역 -->
     <section class="st-sec st-hero">
-      <span class="st-badge">LIVE MARKET WORKSPACE</span>
-      <h1 class="st-h">실전 주식 분석 워크스페이스</h1>
-      <p class="st-p" style="max-width:600px;margin:0 auto;color:#555;">
-        실시간 글로벌 지수와 종목 차트를 한 화면에서 바로 확인하고, 4개의 핵심 분석 창으로 상세 전략을 세우세요.
+      <span class="st-badge">GLOBAL ALL-MARKET SEARCH</span>
+      <h1 class="st-h">전 세계 주식 분석 워크스페이스</h1>
+      <p class="st-p" style="max-width:620px;margin:0 auto;color:#555;">
+        한국·미국·일본·유럽·홍콩 등 전 세계 모든 상장 주식과 ETF·지수를 실시간 자동완성으로 검색하고 바로 차트를 분석하세요.
       </p>
     </section>
 
-    <!-- 2. 내 화면 안에서 바로 보는 실시간 인터랙티브 차트 -->
+    <!-- 2. 글로벌 종목 통합 검색 + 관심종목 + 실시간 차트 -->
     <section class="st-sec live-box">
       <div class="live-head">
         <div>
-          <h2 class="st-h" style="font-size:1.2rem;margin:0;"><span class="live-dot"></span>실시간 주가 · 지수 차트</h2>
-          <span style="font-size:.82rem;color:#666;">차트 좌측 상단 검색창에서 원하는 국내·해외 종목 티커를 직접 검색할 수 있습니다.</span>
+          <h2 class="st-h" style="font-size:1.2rem;margin:0;"><span class="live-dot"></span>전 세계 종목 통합 검색 및 실시간 차트</h2>
         </div>
-        <div class="sym-btns" id="symBtns">
-          <button class="sym-btn is-on" data-sym="KRX:KOSPI">코스피</button>
-          <button class="sym-btn" data-sym="KRX:005930">삼성전자</button>
-          <button class="sym-btn" data-sym="KRX:000660">SK하이닉스</button>
-          <button class="sym-btn" data-sym="NASDAQ:NVDA">엔비디아</button>
-          <button class="sym-btn" data-sym="NASDAQ:AAPL">애플</button>
-        </div>
+        <div class="active-sym" id="activeSymLabel">현재 종목: 코스피 (KRX:KOSPI)</div>
       </div>
 
-      <!-- 실시간 차트 렌더링 컨테이너 -->
-      <div id="tvChartContainer" style="height:440px;width:100%;"></div>
+      <!-- 글로벌 자동완성 검색 폼 -->
+      <div class="search-wrap" id="searchWrap">
+        <form class="search-bar" id="stockSearchForm">
+          <input
+            type="text"
+            id="stockSearchInput"
+            class="search-input"
+            placeholder="전 세계 모든 기업명·티커 검색 (예: 삼성전자, Toyota, ASML, LVMH, Tencent, NVDA, 005930)"
+            autocomplete="off"
+          >
+          <button type="submit" class="search-submit st-hv-press">검색</button>
+          <button type="button" class="fav-btn" id="favToggleBtn">☆ 관심 추가</button>
+        </form>
+        <div class="ac-list" id="acList"></div>
+      </div>
+
+      <p class="search-hint">
+        🌍 <strong>글로벌 검색 팁:</strong> 영문 기업명(<code>Toyota</code>, <code>Sony</code>, <code>ASML</code>, <code>LVMH</code>), 한국 종목명/코드(<code>카카오</code>, <code>035720</code>), 해외 티커(<code>AAPL</code>, <code>7203.T</code>, <code>0700.HK</code>)를 입력하면 전 세계 거래소 목록에서 자동완성됩니다.
+      </p>
+
+      <!-- 글로벌 대표 종목 프리셋 -->
+      <div class="sym-row" id="presetBtns">
+        <span class="sym-label">글로벌 대표:</span>
+        <button type="button" class="sym-btn is-on" data-sym="KRX:KOSPI" data-name="코스피">🇰🇷 코스피</button>
+        <button type="button" class="sym-btn" data-sym="KRX:005930" data-name="삼성전자">🇰🇷 삼성전자</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:NVDA" data-name="엔비디아">🇺🇸 엔비디아</button>
+        <button type="button" class="sym-btn" data-sym="TSE:7203" data-name="도요타">🇯🇵 도요타</button>
+        <button type="button" class="sym-btn" data-sym="EURONEXT:ASML" data-name="ASML">🇳🇱 ASML</button>
+        <button type="button" class="sym-btn" data-sym="HKEX:0700" data-name="텐센트">🇭🇰 텐센트</button>
+      </div>
+
+      <!-- 내 관심종목 -->
+      <div class="sym-row" id="watchlistRow">
+        <span class="sym-label">내 관심종목:</span>
+        <span id="watchlistItems" style="display:flex;gap:6px;flex-wrap:wrap;font-size:.82rem;color:#888;">
+          아직 추가된 관심종목이 없습니다.
+        </span>
+      </div>
+
+      <!-- 실시간 차트 컨테이너 -->
+      <div id="tvChartContainer" style="height:460px;width:100%;"></div>
     </section>
 
     <hr class="st-hr">
@@ -164,7 +224,7 @@ main{max-width:960px;margin:0 auto;padding:16px}
             <h2 class="st-h">④ 목표가 · 알림</h2>
             <ul class="st-list">
               <li><strong>도달 현황:</strong> 전체 알림, 임박(±3%), 완료 건수</li>
-              <li><strong>활성 리스트:</strong> 목표가 괴리율(%) 괴리 바</li>
+              <li><strong>활성 리스트:</strong> 목표가 괴리율(%) 게이지 바</li>
               <li><strong>알림 로그:</strong> 도달 시간·체결가 기록 및 차트 연동</li>
             </ul>
           </div>
@@ -176,21 +236,134 @@ main{max-width:960px;margin:0 auto;padding:16px}
   </main>
 
   <footer class="st-foot">
-    주식 분석 대시보드 · 시장 현황 / 종목 차트 / 기업 분석 / 목표가 알림
+    글로벌 주식 분석 대시보드 · 시장 현황 / 종목 차트 / 기업 분석 / 목표가 알림
   </footer>
 
-  <!-- 실시간 차트 로드 및 빠른 종목 전환 스크립트 -->
+  <!-- 전 세계 종목 검색 및 실시간 차트 제어 스크립트 -->
   <script>
-    function loadTVChart(symbol) {
-      const container = document.getElementById('tvChartContainer');
-      container.innerHTML = '';
-      const script = document.createElement('script');
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-      script.type = 'text/javascript';
+    // 한글 별칭 보완 사전 (한국어 입력 시 글로벌 검색 정확도 향상)
+    const KO_ALIAS = {
+      "삼성전자": { sym: "KRX:005930", name: "삼성전자", exch: "KRX · 한국" },
+      "sk하이닉스": { sym: "KRX:000660", name: "SK하이닉스", exch: "KRX · 한국" },
+      "하이닉스": { sym: "KRX:000660", name: "SK하이닉스", exch: "KRX · 한국" },
+      "lg에너지솔루션": { sym: "KRX:373220", name: "LG에너지솔루션", exch: "KRX · 한국" },
+      "현대차": { sym: "KRX:005380", name: "현대차", exch: "KRX · 한국" },
+      "기아": { sym: "KRX:000270", name: "기아", exch: "KRX · 한국" },
+      "네이버": { sym: "KRX:035420", name: "NAVER", exch: "KRX · 한국" },
+      "카카오": { sym: "KRX:035720", name: "카카오", exch: "KRX · 한국" },
+      "코스피": { sym: "KRX:KOSPI", name: "코스피 지수", exch: "KRX · 한국" },
+      "코스닥": { sym: "KRX:KOSDAQ", name: "코스닥 지수", exch: "KRX · 한국" },
+      "엔비디아": { sym: "NASDAQ:NVDA", name: "NVIDIA Corp.", exch: "NASDAQ · 미국" },
+      "애플": { sym: "NASDAQ:AAPL", name: "Apple Inc.", exch: "NASDAQ · 미국" },
+      "테슬라": { sym: "NASDAQ:TSLA", name: "Tesla, Inc.", exch: "NASDAQ · 미국" },
+      "마이크로소프트": { sym: "NASDAQ:MSFT", name: "Microsoft Corp.", exch: "NASDAQ · 미국" },
+      "구글": { sym: "NASDAQ:GOOGL", name: "Alphabet Inc.", exch: "NASDAQ · 미국" },
+      "아마존": { sym: "NASDAQ:AMZN", name: "Amazon.com, Inc.", exch: "NASDAQ · 미국" },
+      "메타": { sym: "NASDAQ:META", name: "Meta Platforms", exch: "NASDAQ · 미국" },
+      "도요타": { sym: "TSE:7203", name: "Toyota Motor Corp.", exch: "TSE · 일본" },
+      "소니": { sym: "TSE:6758", name: "Sony Group Corp.", exch: "TSE · 일본" },
+      "닌텐도": { sym: "TSE:7974", name: "Nintendo Co., Ltd.", exch: "TSE · 일본" },
+      "텐센트": { sym: "HKEX:0700", name: "Tencent Holdings", exch: "HKEX · 홍콩" },
+      "알리바바": { sym: "HKEX:9988", name: "Alibaba Group", exch: "HKEX · 홍콩" },
+      "tsmc": { sym: "NYSE:TSM", name: "Taiwan Semiconductor", exch: "NYSE · 대만/미국" },
+      "루이비통": { sym: "EURONEXT:MC", name: "LVMH Moet Hennessy", exch: "EURONEXT · 프랑스" },
+      "비트코인": { sym: "BINANCE:BTCUSDT", name: "Bitcoin / USDT", exch: "CRYPTO" }
+    };
+
+    // Yahoo Finance 글로벌 심볼을 TradingView 심볼로 변환
+    function toTradingViewSymbol(quote) {
+      const sym = quote.symbol || "";
+      const exch = (quote.exchange || "").toUpperCase();
+
+      // 한국 (.KS: 코스피 -> KRX, .KQ: 코스닥 -> KRX)
+      if (sym.endsWith(".KS") || sym.endsWith(".KQ")) {
+        return "KRX:" + sym.split(".")[0];
+      }
+      // 일본 (.T -> TSE)
+      if (sym.endsWith(".T")) {
+        return "TSE:" + sym.split(".")[0];
+      }
+      // 홍콩 (.HK -> HKEX, 4자리 패딩)
+      if (sym.endsWith(".HK")) {
+        const code = sym.split(".")[0].padStart(4, "0");
+        return "HKEX:" + code;
+      }
+      // 대만 (.TW -> TWSE)
+      if (sym.endsWith(".TW")) {
+        return "TWSE:" + sym.split(".")[0];
+      }
+      // 런던 (.L -> LSE)
+      if (sym.endsWith(".L")) {
+        return "LSE:" + sym.split(".")[0];
+      }
+      // 독일 프랑크푸르트 (.DE -> XETR)
+      if (sym.endsWith(".DE")) {
+        return "XETR:" + sym.split(".")[0];
+      }
+      // 파리/암스테르담 (.PA, .AS -> EURONEXT)
+      if (sym.endsWith(".PA") || sym.endsWith(".AS")) {
+        return "EURONEXT:" + sym.split(".")[0];
+      }
+      // 토론토 (.TO -> TSX)
+      if (sym.endsWith(".TO")) {
+        return "TSX:" + sym.split(".")[0];
+      }
+      // 호주 (.AX -> ASX)
+      if (sym.endsWith(".AX")) {
+        return "ASX:" + sym.split(".")[0];
+      }
+      // 인도 (.NS -> NSE, .BO -> BSE)
+      if (sym.endsWith(".NS")) {
+        return "NSE:" + sym.split(".")[0];
+      }
+      if (sym.endsWith(".BO")) {
+        return "BSE:" + sym.split(".")[0];
+      }
+      // 상하이/선전 (.SS -> SSE, .SZ -> SZSE)
+      if (sym.endsWith(".SS")) {
+        return "SSE:" + sym.split(".")[0];
+      }
+      if (sym.endsWith(".SZ")) {
+        return "SZSE:" + sym.split(".")[0];
+      }
+      // 미국 거래소 매핑
+      if (exch === "NMS" || exch === "NGM" || exch === "NCM" || exch === "NAS") {
+        return "NASDAQ:" + sym;
+      }
+      if (exch === "NYQ" || exch === "NYS") {
+        return "NYSE:" + sym;
+      }
+      if (exch === "ASE" || exch === "PCX" || exch === "BTS") {
+        return "AMEX:" + sym;
+      }
+      // 암호화폐 (-USD)
+      if (sym.endsWith("-USD")) {
+        return "COINBASE:" + sym.replace("-", "");
+      }
+      return sym;
+    }
+
+    let currentStock = { symbol: "KRX:KOSPI", name: "코스피" };
+    let watchlist = JSON.parse(localStorage.getItem("myGlobalWatchlist") || "[]");
+    let searchTimer = null;
+
+    const inputEl = document.getElementById("stockSearchInput");
+    const acListEl = document.getElementById("acList");
+
+    function loadTVChart(symbol, name) {
+      currentStock = { symbol, name: name || symbol };
+      document.getElementById("activeSymLabel").textContent = `현재 종목: ${currentStock.name} (${currentStock.symbol})`;
+      acListEl.classList.remove("is-open");
+
+      const container = document.getElementById("tvChartContainer");
+      container.innerHTML = "";
+      const script = document.createElement("script");
+      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+      script.type = "text/javascript";
       script.async = true;
       script.innerHTML = JSON.stringify({
         autosize: true,
-        symbol: symbol,
+        symbol: currentStock.symbol,
         interval: "D",
         timezone: "Asia/Seoul",
         theme: "light",
@@ -202,18 +375,213 @@ main{max-width:960px;margin:0 auto;padding:16px}
         support_host: "https://www.tradingview.com"
       });
       container.appendChild(script);
+
+      updateActiveButtons();
+      updateFavButtonState();
     }
 
-    // 초기 코스피 차트 로드
-    loadTVChart('KRX:KOSPI');
+    // 전 세계 종목 실시간 자동완성 조회
+    async function searchGlobalStocks(query) {
+      const q = query.trim();
+      if (!q) {
+        acListEl.classList.remove("is-open");
+        return;
+      }
 
-    // 상단 빠른 종목 버튼 클릭 이벤트
-    document.getElementById('symBtns').addEventListener('click', function(e) {
-      if (!e.target.classList.contains('sym-btn')) return;
-      document.querySelectorAll('.sym-btn').forEach(btn => btn.classList.remove('is-on'));
-      e.target.classList.add('is-on');
-      loadTVChart(e.target.dataset.sym);
+      const results = [];
+      const lower = q.toLowerCase();
+
+      // 1) 한글 별칭 매칭 우선 추가
+      Object.keys(KO_ALIAS).forEach(key => {
+        if (key.includes(lower) || KO_ALIAS[key].name.toLowerCase().includes(lower)) {
+          results.push({
+            tvSym: KO_ALIAS[key].sym,
+            name: KO_ALIAS[key].name,
+            sub: `${KO_ALIAS[key].sym} · ${KO_ALIAS[key].exch}`,
+            type: "추천 매칭"
+          });
+        }
+      });
+
+      // 2) 6자리 한국 종목코드 직접 입력 대응
+      if (/^\d{6}$/.test(q)) {
+        results.push({
+          tvSym: `KRX:${q}`,
+          name: `한국 상장종목 (${q})`,
+          sub: `KRX:${q} · 한국거래소`,
+          type: "KRX 코드"
+        });
+      }
+
+      acListEl.innerHTML = '<div class="ac-status">전 세계 거래소 검색 중...</div>';
+      acListEl.classList.add("is-open");
+
+      try {
+        const targetUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=12&newsCount=0`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(proxyUrl);
+        const wrapped = await res.json();
+        const data = JSON.parse(wrapped.contents);
+
+        if (data && Array.isArray(data.quotes)) {
+          data.quotes.forEach(item => {
+            if (!item.symbol) return;
+            const tvSym = toTradingViewSymbol(item);
+            // 중복 제거
+            if (results.some(r => r.tvSym === tvSym)) return;
+
+            const dispName = item.shortname || item.longname || item.symbol;
+            const exchName = item.exchDisp || item.exchange || "";
+            const qType = item.typeDisp || item.quoteType || "STOCK";
+
+            results.push({
+              tvSym: tvSym,
+              name: dispName,
+              sub: `${tvSym} (원본: ${item.symbol}) · ${exchName}`,
+              type: qType
+            });
+          });
+        }
+      } catch (err) {
+        // 네트워크 제한 시에도 사용자가 입력한 티커로 바로 조회 가능하도록 폴백 제공
+        if (results.length === 0) {
+          const fallbackSym = q.includes(":") ? q.toUpperCase() : q.toUpperCase();
+          results.push({
+            tvSym: fallbackSym,
+            name: fallbackSym,
+            sub: `${fallbackSym} 심볼로 차트 바로 열기`,
+            type: "직접 입력"
+          });
+        }
+      }
+
+      renderAutocomplete(results, q);
+    }
+
+    function renderAutocomplete(results, rawQuery) {
+      acListEl.innerHTML = "";
+      if (results.length === 0) {
+        const directSym = rawQuery.trim().toUpperCase();
+        const div = document.createElement("div");
+        div.className = "ac-item";
+        div.innerHTML = `
+          <div class="ac-main">
+            <span class="ac-name">"${directSym}" 심볼로 직접 조회</span>
+            <span class="ac-sub">차트 내부 검색창(🔍)에서도 전 세계 모든 종목을 찾을 수 있습니다.</span>
+          </div>
+          <span class="ac-tag">직접 실행</span>
+        `;
+        div.addEventListener("click", () => loadTVChart(directSym, directSym));
+        acListEl.appendChild(div);
+        return;
+      }
+
+      results.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "ac-item";
+        div.innerHTML = `
+          <div class="ac-main">
+            <span class="ac-name">${item.name}</span>
+            <span class="ac-sub">${item.sub}</span>
+          </div>
+          <span class="ac-tag">${item.type}</span>
+        `;
+        div.addEventListener("click", () => {
+          inputEl.value = item.name;
+          loadTVChart(item.tvSym, item.name);
+        });
+        acListEl.appendChild(div);
+      });
+    }
+
+    function updateActiveButtons() {
+      document.querySelectorAll(".sym-btn").forEach(btn => {
+        btn.classList.toggle("is-on", btn.dataset.sym === currentStock.symbol);
+      });
+    }
+
+    function updateFavButtonState() {
+      const favBtn = document.getElementById("favToggleBtn");
+      const exists = watchlist.some(item => item.symbol === currentStock.symbol);
+      favBtn.classList.toggle("is-fav", exists);
+      favBtn.textContent = exists ? "★ 관심 등록됨" : "☆ 관심 추가";
+    }
+
+    function renderWatchlist() {
+      const wrap = document.getElementById("watchlistItems");
+      if (watchlist.length === 0) {
+        wrap.innerHTML = '<span style="color:#888;">아직 추가된 관심종목이 없습니다.</span>';
+        return;
+      }
+      wrap.innerHTML = "";
+      watchlist.forEach(item => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sym-btn" + (item.symbol === currentStock.symbol ? " is-on" : "");
+        btn.dataset.sym = item.symbol;
+        btn.dataset.name = item.name;
+        btn.textContent = `★ ${item.name}`;
+        btn.addEventListener("click", () => loadTVChart(item.symbol, item.name));
+        wrap.appendChild(btn);
+      });
+    }
+
+    // 입력 시 실시간 디바운스 검색
+    inputEl.addEventListener("input", function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => searchGlobalStocks(inputEl.value), 300);
     });
+
+    // 검색 버튼/엔터 제출 시 첫 번째 결과 또는 입력 심볼로 즉시 로드
+    document.getElementById("stockSearchForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const firstItem = acListEl.querySelector(".ac-item");
+      if (firstItem && acListEl.classList.contains("is-open")) {
+        firstItem.click();
+        return;
+      }
+      const raw = inputEl.value.trim();
+      if (!raw) return;
+      const lower = raw.toLowerCase();
+      if (KO_ALIAS[lower]) {
+        loadTVChart(KO_ALIAS[lower].sym, KO_ALIAS[lower].name);
+      } else if (/^\d{6}$/.test(raw)) {
+        loadTVChart(`KRX:${raw}`, raw);
+      } else {
+        loadTVChart(raw.toUpperCase(), raw.toUpperCase());
+      }
+    });
+
+    // 검색창 바깥 클릭 시 자동완성 닫기
+    document.addEventListener("click", function(e) {
+      if (!document.getElementById("searchWrap").contains(e.target)) {
+        acListEl.classList.remove("is-open");
+      }
+    });
+
+    // 대표 종목 클릭
+    document.getElementById("presetBtns").addEventListener("click", function(e) {
+      const btn = e.target.closest(".sym-btn");
+      if (!btn) return;
+      loadTVChart(btn.dataset.sym, btn.dataset.name);
+    });
+
+    // 관심종목 추가/해제
+    document.getElementById("favToggleBtn").addEventListener("click", function() {
+      const idx = watchlist.findIndex(item => item.symbol === currentStock.symbol);
+      if (idx >= 0) {
+        watchlist.splice(idx, 1);
+      } else {
+        watchlist.push({ symbol: currentStock.symbol, name: currentStock.name });
+      }
+      localStorage.setItem("myGlobalWatchlist", JSON.stringify(watchlist));
+      renderWatchlist();
+      updateFavButtonState();
+    });
+
+    // 초기 실행
+    renderWatchlist();
+    loadTVChart(currentStock.symbol, currentStock.name);
   </script>
 
 </body></html>
