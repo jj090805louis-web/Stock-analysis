@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주식 분석 대시보드</title>
+<style>
+body{margin:0;font-family:"Noto Sans KR",system-ui,sans-serif;background:#fafafa;color:#222;line-height:1.6}
+main{max-width:960px;margin:0 auto;padding:16px}
+</style>
+<style data-studio="css">
+:root{--st-accent:#e2557a}
+.st-nav{position:sticky;top:0;z-index:50;width:100%;box-sizing:border-box;background:#fff;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);border-bottom:1px solid rgba(0,0,0,.08)}
+.st-nav-in{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:10px 12px;max-width:960px;margin:0 auto}
+.st-nav-a{display:inline-block;padding:8px 14px;border-radius:999px;text-decoration:none;color:#333;font-weight:700;font-size:15px;line-height:1.2}
+.st-nav-a:hover{background:rgba(0,0,0,.06)}
+.st-nav-a.is-on{background:var(--st-accent);color:#fff}
+.st-sec{box-sizing:border-box;width:100%;max-width:960px;margin:20px auto;padding:20px}
+.st-h{font-size:1.5rem;font-weight:800;line-height:1.3;margin:0 0 12px}
+.st-p{font-size:.98rem;line-height:1.7;margin:0 0 12px}
+.st-btn{display:inline-block;padding:10px 18px;border-radius:12px;background:var(--st-accent);color:#fff!important;text-decoration:none;font-weight:700;font-size:.92rem;line-height:1.2;border:0;cursor:pointer;margin-top:12px;text-align:center}
+.st-btn:hover{filter:brightness(1.08)}
+.st-hero{text-align:center;padding:28px 20px;border-radius:20px;background:#f6f6f6;background:color-mix(in srgb,var(--st-accent) 10%,#fff)}
+.st-hero .st-h{font-size:1.75rem}
+.st-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.st-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.st-ico{font-size:1.8rem;line-height:1;margin:0 0 10px}
+.st-card .st-h{font-size:1.15rem;margin:0 0 8px}
+.st-list{margin:0;padding-left:1.2em;line-height:1.7;font-size:.9rem;color:#444}
+.st-list li{margin-bottom:4px}
+.st-hr{border:0;border-top:2px dashed rgba(0,0,0,.15);margin:28px auto;max-width:960px}
+.st-foot{text-align:center;font-size:.875rem;opacity:.7;padding:24px 12px}
+.st-hv-lift,.st-hv-press{transition:translate .2s,scale .2s,box-shadow .2s}
+@media(hover:hover){.st-hv-lift:hover{translate:0 -5px;box-shadow:0 12px 24px rgba(0,0,0,.12)}}
+.st-hv-press:active{scale:.96}
+.st-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--st-accent) 15%,#fff);color:var(--st-accent);margin-bottom:6px}
+.live-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden}
+.live-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sym-btns{display:flex;gap:6px;flex-wrap:wrap}
+.sym-btn{padding:6px 12px;border-radius:999px;border:1px solid rgba(0,0,0,.15);background:#fff;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;color:#333}
+.sym-btn.is-on{background:var(--st-accent);color:#fff;border-color:var(--st-accent)}
+</style></head>
+<body>
+
+  <!-- 상단 네비게이션 -->
+  <nav class="st-nav">
+    <div class="st-nav-in">
+      <a class="st-nav-a is-on" href="index.html">홈 요약</a>
+      <a class="st-nav-a" href="market.html">시장 현황</a>
+      <a class="st-nav-a" href="chart.html">종목 차트</a>
+      <a class="st-nav-a" href="company.html">기업 분석</a>
+      <a class="st-nav-a" href="goal.html">목표가 알림</a>
+    </div>
+  </nav>
+
+  <!-- 1. 상단 실시간 주요 지수·종목 전광판 (Ticker Tape) -->
+  <div style="background:#fff;border-bottom:1px solid rgba(0,0,0,.08);">
+    <div class="tradingview-widget-container" style="max-width:960px;margin:0 auto;">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {
+        "symbols": [
+          { "proName": "KRX:KOSPI", "title": "코스피" },
+          { "proName": "KRX:KOSDAQ", "title": "코스닥" },
+          { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+          { "proName": "NASDAQ:NDX", "title": "나스닥 100" },
+          { "proName": "FX_IDC:USDKRW", "title": "원/달러 환율" },
+          { "proName": "KRX:005930", "title": "삼성전자" },
+          { "proName": "NASDAQ:NVDA", "title": "엔비디아" }
+        ],
+        "showSymbolLogo": true,
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "colorTheme": "light",
+        "locale": "kr"
+      }
+      </script>
+    </div>
+  </div>
+
+  <main>
+    <!-- 히어로 소개 영역 -->
+    <section class="st-sec st-hero">
+      <span class="st-badge">LIVE MARKET WORKSPACE</span>
+      <h1 class="st-h">실전 주식 분석 워크스페이스</h1>
+      <p class="st-p" style="max-width:600px;margin:0 auto;color:#555;">
+        실시간 글로벌 지수와 종목 차트를 한 화면에서 바로 확인하고, 4개의 핵심 분석 창으로 상세 전략을 세우세요.
+      </p>
+    </section>
+
+    <!-- 2. 내 화면 안에서 바로 보는 실시간 인터랙티브 차트 -->
+    <section class="st-sec live-box">
+      <div class="live-head">
+        <div>
+          <h2 class="st-h" style="font-size:1.2rem;margin:0;"><span class="live-dot"></span>실시간 주가 · 지수 차트</h2>
+          <span style="font-size:.82rem;color:#666;">차트 좌측 상단 검색창에서 원하는 국내·해외 종목 티커를 직접 검색할 수 있습니다.</span>
+        </div>
+        <div class="sym-btns" id="symBtns">
+          <button class="sym-btn is-on" data-sym="KRX:KOSPI">코스피</button>
+          <button class="sym-btn" data-sym="KRX:005930">삼성전자</button>
+          <button class="sym-btn" data-sym="KRX:000660">SK하이닉스</button>
+          <button class="sym-btn" data-sym="NASDAQ:NVDA">엔비디아</button>
+          <button class="sym-btn" data-sym="NASDAQ:AAPL">애플</button>
+        </div>
+      </div>
+
+      <!-- 실시간 차트 렌더링 컨테이너 -->
+      <div id="tvChartContainer" style="height:440px;width:100%;"></div>
+    </section>
+
+    <hr class="st-hr">
+
+    <!-- 3. 4개 핵심 분석 창 요약 카드 -->
+    <section class="st-sec" style="padding:0">
+      <div class="st-cards">
+        
+        <!-- ① 시장 현황 -->
+        <article class="st-card st-hv-lift">
+          <div>
+            <div class="st-ico">🌐</div>
+            <h2 class="st-h">① 시장 현황</h2>
+            <ul class="st-list">
+              <li><strong>주요 지수:</strong> 코스피·코스닥, S&P500, 나스닥, 환율</li>
+              <li><strong>섹터 히트맵:</strong> 강세·약세 업종 시각화</li>
+              <li><strong>시장 지표:</strong> 등락 종목 비율 및 외인·기관 수급</li>
+            </ul>
+          </div>
+          <a class="st-btn st-hv-press" href="market.html">시장 현황 열기 →</a>
+        </article>
+
+        <!-- ② 종목 차트 -->
+        <article class="st-card st-hv-lift">
+          <div>
+            <div class="st-ico">📈</div>
+            <h2 class="st-h">② 종목 차트</h2>
+            <ul class="st-list">
+              <li><strong>메인 캔들 차트:</strong> 분~월봉, 이평선(MA), RSI·MACD</li>
+              <li><strong>시세·호가 요약:</strong> 현재가, 52주 최고/최저, 체결강도</li>
+              <li><strong>매매 동향:</strong> 외인·기관·개인 순매수 추이</li>
+            </ul>
+          </div>
+          <a class="st-btn st-hv-press" href="chart.html">종목 차트 열기 →</a>
+        </article>
+
+        <!-- ③ 기업 분석 -->
+        <article class="st-card st-hv-lift">
+          <div>
+            <div class="st-ico">🏢</div>
+            <h2 class="st-h">③ 기업 분석</h2>
+            <ul class="st-list">
+              <li><strong>밸류에이션:</strong> 시총, PER, PBR, ROE, EPS, 배당</li>
+              <li><strong>실적 추이:</strong> 분기·연간 매출 및 영업이익률</li>
+              <li><strong>경쟁사 비교:</strong> 동종 업계 멀티플·수익률 표</li>
+            </ul>
+          </div>
+          <a class="st-btn st-hv-press" href="company.html">기업 분석 열기 →</a>
+        </article>
+
+        <!-- ④ 목표가 알림 -->
+        <article class="st-card st-hv-lift">
+          <div>
+            <div class="st-ico">🔔</div>
+            <h2 class="st-h">④ 목표가 · 알림</h2>
+            <ul class="st-list">
+              <li><strong>도달 현황:</strong> 전체 알림, 임박(±3%), 완료 건수</li>
+              <li><strong>활성 리스트:</strong> 목표가 괴리율(%) 괴리 바</li>
+              <li><strong>알림 로그:</strong> 도달 시간·체결가 기록 및 차트 연동</li>
+            </ul>
+          </div>
+          <a class="st-btn st-hv-press" href="goal.html">목표가 알림 열기 →</a>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="st-foot">
+    주식 분석 대시보드 · 시장 현황 / 종목 차트 / 기업 분석 / 목표가 알림
+  </footer>
+
+  <!-- 실시간 차트 로드 및 빠른 종목 전환 스크립트 -->
+  <script>
+    function loadTVChart(symbol) {
+      const container = document.getElementById('tvChartContainer');
+      container.innerHTML = '';
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+      script.type = 'text/javascript';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        autosize: true,
+        symbol: symbol,
+        interval: "D",
+        timezone: "Asia/Seoul",
+        theme: "light",
+        style: "1",
+        locale: "kr",
+        enable_publishing: false,
+        allow_symbol_change: true,
+        calendar: false,
+        support_host: "https://www.tradingview.com"
+      });
+      container.appendChild(script);
+    }
+
+    // 초기 코스피 차트 로드
+    loadTVChart('KRX:KOSPI');
+
+    // 상단 빠른 종목 버튼 클릭 이벤트
+    document.getElementById('symBtns').addEventListener('click', function(e) {
+      if (!e.target.classList.contains('sym-btn')) return;
+      document.querySelectorAll('.sym-btn').forEach(btn => btn.classList.remove('is-on'));
+      e.target.classList.add('is-on');
+      loadTVChart(e.target.dataset.sym);
+    });
+  </script>
+
+</body></html>
