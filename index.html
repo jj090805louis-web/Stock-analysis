@@ -2,7 +2,7 @@
 <html lang="ko"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>글로벌 주식 분석 대시보드</title>
+<title>미국 주식 분석 대시보드</title>
 <style>
 body{margin:0;font-family:"Noto Sans KR",system-ui,sans-serif;background:#fafafa;color:#222;line-height:1.6}
 main{max-width:960px;margin:0 auto;padding:16px}
@@ -11,7 +11,7 @@ main{max-width:960px;margin:0 auto;padding:16px}
 :root{--st-accent:#e2557a}
 .st-nav{position:sticky;top:0;z-index:50;width:100%;box-sizing:border-box;background:#fff;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);border-bottom:1px solid rgba(0,0,0,.08)}
 .st-nav-in{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:10px 12px;max-width:960px;margin:0 auto}
-.st-nav-a{display:inline-block;padding:8px 14px;border-radius:999px;text-decoration:none;color:#333;font-weight:700;font-size:15px;line-height:1.2}
+.st-nav-a{display:inline-block;padding:8px 14px;border-radius:999px;text-decoration:none;color:#333;font-weight:700;font-size:15px;line-height:1.2;border:0;background:transparent;cursor:pointer;font-family:inherit}
 .st-nav-a:hover{background:rgba(0,0,0,.06)}
 .st-nav-a.is-on{background:var(--st-accent);color:#fff}
 .st-sec{box-sizing:border-box;width:100%;max-width:960px;margin:20px auto;padding:20px}
@@ -34,7 +34,11 @@ main{max-width:960px;margin:0 auto;padding:16px}
 .st-hv-press:active{scale:.96}
 .st-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--st-accent) 15%,#fff);color:var(--st-accent);margin-bottom:6px}
 
-/* 글로벌 검색 및 차트 패널 */
+/* 페이지 전환 패널 */
+.view-panel{display:none}
+.view-panel.is-active{display:block}
+
+/* 검색 및 차트 패널 */
 .live-box{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:visible}
 .live-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;animation:pulse 1.5s infinite}
@@ -45,18 +49,16 @@ main{max-width:960px;margin:0 auto;padding:16px}
 .search-input{flex:1 1 240px;padding:11px 14px;border:1.5px solid rgba(0,0,0,.18);border-radius:12px;font:inherit;font-size:.95rem;background:#fff;color:#222}
 .search-input:focus{outline:2px solid var(--st-accent);border-color:var(--st-accent)}
 .search-submit{padding:10px 18px;border-radius:12px;border:0;background:var(--st-accent);color:#fff;font:inherit;font-weight:700;font-size:.92rem;cursor:pointer}
-.search-submit:hover{filter:brightness(1.06)}
 .fav-btn{padding:10px 14px;border-radius:12px;border:1.5px solid rgba(0,0,0,.15);background:#fff;color:#333;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer}
 .fav-btn.is-fav{border-color:#f59e0b;background:#fffbeb;color:#b45309}
 
-/* 자동완성 드롭다운 */
 .ac-list{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:100;background:#fff;border:1px solid rgba(0,0,0,.14);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.15);max-height:320px;overflow-y:auto;display:none}
 .ac-list.is-open{display:block}
 .ac-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;text-align:left}
 .ac-item:last-child{border-bottom:0}
-.ac-item:hover,.ac-item.is-active{background:color-mix(in srgb,var(--st-accent) 8%,#fff)}
+.ac-item:hover{background:color-mix(in srgb,var(--st-accent) 8%,#fff)}
 .ac-main{display:flex;flex-direction:column;min-width:0}
-.ac-name{font-weight:700;font-size:.94rem;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-name{font-weight:700;font-size:.94rem;color:#111}
 .ac-sub{font-size:.78rem;color:#666}
 .ac-tag{flex:none;font-size:.75rem;font-weight:700;padding:3px 8px;border-radius:6px;background:#f1f3f5;color:#333}
 .ac-status{padding:12px 14px;font-size:.86rem;color:#666;text-align:center}
@@ -65,37 +67,46 @@ main{max-width:960px;margin:0 auto;padding:16px}
 .sym-label{font-size:.8rem;font-weight:700;color:#666;margin-right:4px}
 .sym-btn{padding:6px 12px;border-radius:999px;border:1px solid rgba(0,0,0,.15);background:#fff;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;color:#333}
 .sym-btn.is-on{background:var(--st-accent);color:#fff;border-color:var(--st-accent)}
-.search-hint{font-size:.8rem;color:#666;margin:0 0 12px}
 .active-sym{font-size:.88rem;font-weight:700;color:var(--st-accent)}
+
+/* 보조 위젯 및 목표가 알림 */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi-box{background:#f8f9fa;border:1px solid rgba(0,0,0,.07);border-radius:12px;padding:14px}
+.kpi-title{font-size:.8rem;color:#666;font-weight:700}
+.kpi-val{font-size:1.35rem;font-weight:800;margin-top:4px}
+.goal-item{border:1px solid rgba(0,0,0,.09);border-radius:12px;padding:14px;margin-bottom:10px;background:#fff}
+.goal-bar{height:8px;border-radius:99px;background:#eee;overflow:hidden;margin:8px 0}
+.goal-bar i{display:block;height:100%;background:var(--st-accent)}
+.del-btn{padding:4px 10px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#d9475a;font-size:.78rem;font-weight:700;cursor:pointer}
 </style></head>
 <body>
 
   <!-- 상단 네비게이션 -->
-  <nav class="st-nav">
+  <nav class="st-nav" id="mainNav">
     <div class="st-nav-in">
-      <a class="st-nav-a is-on" href="index.html">홈 요약</a>
-      <a class="st-nav-a" href="market.html">시장 현황</a>
-      <a class="st-nav-a" href="chart.html">종목 차트</a>
-      <a class="st-nav-a" href="company.html">기업 분석</a>
-      <a class="st-nav-a" href="goal.html">목표가 알림</a>
+      <button type="button" class="st-nav-a is-on" data-view="home">홈 요약</button>
+      <button type="button" class="st-nav-a" data-view="market">① 미국 시장</button>
+      <button type="button" class="st-nav-a" data-view="chart">② 종목 차트</button>
+      <button type="button" class="st-nav-a" data-view="company">③ 기업 분석</button>
+      <button type="button" class="st-nav-a" data-view="goal">④ 목표가 알림</button>
     </div>
   </nav>
 
-  <!-- 1. 상단 실시간 글로벌 주요 지수·종목 전광판 -->
+  <!-- 상단 실시간 미국 증시 전광판 -->
   <div style="background:#fff;border-bottom:1px solid rgba(0,0,0,.08);">
     <div class="tradingview-widget-container" style="max-width:960px;margin:0 auto;">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
       {
         "symbols": [
-          { "proName": "KRX:KOSPI", "title": "코스피" },
-          { "proName": "KRX:KOSDAQ", "title": "코스닥" },
           { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
           { "proName": "NASDAQ:NDX", "title": "나스닥 100" },
-          { "proName": "INDEX:NKY", "title": "닛케이 225" },
+          { "proName": "DJ:DJI", "title": "다우존스" },
+          { "proName": "TVC:US10Y", "title": "미 10년물 국채" },
           { "proName": "FX_IDC:USDKRW", "title": "원/달러 환율" },
-          { "proName": "KRX:005930", "title": "삼성전자" },
-          { "proName": "NASDAQ:NVDA", "title": "엔비디아" }
+          { "proName": "NASDAQ:NVDA", "title": "엔비디아 (NVDA)" },
+          { "proName": "NASDAQ:AAPL", "title": "애플 (AAPL)" },
+          { "proName": "NASDAQ:TSLA", "title": "테슬라 (TSLA)" }
         ],
         "showSymbolLogo": true,
         "isTransparent": true,
@@ -108,312 +119,402 @@ main{max-width:960px;margin:0 auto;padding:16px}
   </div>
 
   <main>
-    <!-- 히어로 소개 영역 -->
-    <section class="st-sec st-hero">
-      <span class="st-badge">GLOBAL ALL-MARKET SEARCH</span>
-      <h1 class="st-h">전 세계 주식 분석 워크스페이스</h1>
-      <p class="st-p" style="max-width:620px;margin:0 auto;color:#555;">
-        한국·미국·일본·유럽·홍콩 등 전 세계 모든 상장 주식과 ETF·지수를 실시간 자동완성으로 검색하고 바로 차트를 분석하세요.
-      </p>
-    </section>
-
-    <!-- 2. 글로벌 종목 통합 검색 + 관심종목 + 실시간 차트 -->
-    <section class="st-sec live-box">
+    <!-- 미국 주식 전용 검색 바 -->
+    <section class="st-sec live-box" style="margin-bottom:16px">
       <div class="live-head">
         <div>
-          <h2 class="st-h" style="font-size:1.2rem;margin:0;"><span class="live-dot"></span>전 세계 종목 통합 검색 및 실시간 차트</h2>
+          <h2 class="st-h" style="font-size:1.15rem;margin:0;"><span class="live-dot"></span>미국 주식 검색 (NASDAQ · NYSE · AMEX)</h2>
         </div>
-        <div class="active-sym" id="activeSymLabel">현재 종목: 코스피 (KRX:KOSPI)</div>
+        <div class="active-sym" id="activeSymLabel">현재 종목: 엔비디아 (NASDAQ:NVDA)</div>
       </div>
 
-      <!-- 글로벌 자동완성 검색 폼 -->
       <div class="search-wrap" id="searchWrap">
         <form class="search-bar" id="stockSearchForm">
           <input
             type="text"
             id="stockSearchInput"
             class="search-input"
-            placeholder="전 세계 모든 기업명·티커 검색 (예: 삼성전자, Toyota, ASML, LVMH, Tencent, NVDA, 005930)"
+            placeholder="미국 종목명 또는 티커 입력 (예: 엔비디아, NVDA, 애플, AAPL, 테슬라, TSLA, SPY)"
             autocomplete="off"
           >
-          <button type="submit" class="search-submit st-hv-press">검색</button>
+          <button type="submit" class="search-submit st-hv-press">미국 종목 검색</button>
           <button type="button" class="fav-btn" id="favToggleBtn">☆ 관심 추가</button>
         </form>
         <div class="ac-list" id="acList"></div>
       </div>
 
-      <p class="search-hint">
-        🌍 <strong>글로벌 검색 팁:</strong> 영문 기업명(<code>Toyota</code>, <code>Sony</code>, <code>ASML</code>, <code>LVMH</code>), 한국 종목명/코드(<code>카카오</code>, <code>035720</code>), 해외 티커(<code>AAPL</code>, <code>7203.T</code>, <code>0700.HK</code>)를 입력하면 전 세계 거래소 목록에서 자동완성됩니다.
-      </p>
-
-      <!-- 글로벌 대표 종목 프리셋 -->
       <div class="sym-row" id="presetBtns">
-        <span class="sym-label">글로벌 대표:</span>
-        <button type="button" class="sym-btn is-on" data-sym="KRX:KOSPI" data-name="코스피">🇰🇷 코스피</button>
-        <button type="button" class="sym-btn" data-sym="KRX:005930" data-name="삼성전자">🇰🇷 삼성전자</button>
-        <button type="button" class="sym-btn" data-sym="NASDAQ:NVDA" data-name="엔비디아">🇺🇸 엔비디아</button>
-        <button type="button" class="sym-btn" data-sym="TSE:7203" data-name="도요타">🇯🇵 도요타</button>
-        <button type="button" class="sym-btn" data-sym="EURONEXT:ASML" data-name="ASML">🇳🇱 ASML</button>
-        <button type="button" class="sym-btn" data-sym="HKEX:0700" data-name="텐센트">🇭🇰 텐센트</button>
+        <span class="sym-label">미국 대표주·ETF:</span>
+        <button type="button" class="sym-btn is-on" data-sym="NASDAQ:NVDA" data-name="엔비디아 (NVDA)">NVDA</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:AAPL" data-name="애플 (AAPL)">AAPL</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:MSFT" data-name="마이크로소프트 (MSFT)">MSFT</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:TSLA" data-name="테슬라 (TSLA)">TSLA</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:GOOGL" data-name="알파벳 (GOOGL)">GOOGL</button>
+        <button type="button" class="sym-btn" data-sym="AMEX:SPY" data-name="S&P 500 ETF (SPY)">SPY</button>
+        <button type="button" class="sym-btn" data-sym="NASDAQ:QQQ" data-name="나스닥 100 ETF (QQQ)">QQQ</button>
       </div>
 
-      <!-- 내 관심종목 -->
-      <div class="sym-row" id="watchlistRow">
-        <span class="sym-label">내 관심종목:</span>
+      <div class="sym-row" id="watchlistRow" style="margin-bottom:0">
+        <span class="sym-label">내 미국 관심종목:</span>
         <span id="watchlistItems" style="display:flex;gap:6px;flex-wrap:wrap;font-size:.82rem;color:#888;">
-          아직 추가된 관심종목이 없습니다.
+          아직 추가된 미국 관심종목이 없습니다.
         </span>
       </div>
-
-      <!-- 실시간 차트 컨테이너 -->
-      <div id="tvChartContainer" style="height:460px;width:100%;"></div>
     </section>
 
-    <hr class="st-hr">
+    <!-- ================= [VIEW 0: 홈 요약] ================= -->
+    <div class="view-panel is-active" id="view-home">
+      <section class="st-sec st-hero">
+        <span class="st-badge">US STOCKS ONLY · WORKSPACE</span>
+        <h1 class="st-h">미국 주식 분석 워크스페이스</h1>
+        <p class="st-p" style="max-width:600px;margin:0 auto;color:#555;">
+          나스닥·뉴욕증시 상장 종목과 미국 ETF·지수를 중심으로 시세 차트, 기업 재무, 목표가 알림을 4개 창에서 관리합니다.
+        </p>
+      </section>
 
-    <!-- 3. 4개 핵심 분석 창 요약 카드 -->
-    <section class="st-sec" style="padding:0">
-      <div class="st-cards">
-        
-        <!-- ① 시장 현황 -->
-        <article class="st-card st-hv-lift">
-          <div>
-            <div class="st-ico">🌐</div>
-            <h2 class="st-h">① 시장 현황</h2>
-            <ul class="st-list">
-              <li><strong>주요 지수:</strong> 코스피·코스닥, S&P500, 나스닥, 환율</li>
-              <li><strong>섹터 히트맵:</strong> 강세·약세 업종 시각화</li>
-              <li><strong>시장 지표:</strong> 등락 종목 비율 및 외인·기관 수급</li>
-            </ul>
-          </div>
-          <a class="st-btn st-hv-press" href="market.html">시장 현황 열기 →</a>
-        </article>
+      <section class="st-sec" style="padding:0">
+        <div class="st-cards">
+          <article class="st-card st-hv-lift">
+            <div>
+              <div class="st-ico">🇺🇸</div>
+              <h2 class="st-h">① 미국 시장</h2>
+              <ul class="st-list">
+                <li><strong>미국 지수·금리:</strong> S&P 500, 나스닥, 다우, 10년물 국채</li>
+                <li><strong>섹터 히트맵:</strong> S&P 500 업종별 등락 시각화</li>
+                <li><strong>환율 동향:</strong> 원/달러 환율 실시간 추이</li>
+              </ul>
+            </div>
+            <button type="button" class="st-btn st-hv-press" data-goto="market">미국 시장 열기 →</button>
+          </article>
 
-        <!-- ② 종목 차트 -->
-        <article class="st-card st-hv-lift">
-          <div>
-            <div class="st-ico">📈</div>
-            <h2 class="st-h">② 종목 차트</h2>
-            <ul class="st-list">
-              <li><strong>메인 캔들 차트:</strong> 분~월봉, 이평선(MA), RSI·MACD</li>
-              <li><strong>시세·호가 요약:</strong> 현재가, 52주 최고/최저, 체결강도</li>
-              <li><strong>매매 동향:</strong> 외인·기관·개인 순매수 추이</li>
-            </ul>
-          </div>
-          <a class="st-btn st-hv-press" href="chart.html">종목 차트 열기 →</a>
-        </article>
+          <article class="st-card st-hv-lift">
+            <div>
+              <div class="st-ico">📈</div>
+              <h2 class="st-h">② 종목 차트</h2>
+              <ul class="st-list">
+                <li><strong>캔들 차트:</strong> 분~월봉, 이동평균선, RSI·MACD</li>
+                <li><strong>기술적 분석:</strong> 매수·매도 오실레이터 요약</li>
+                <li><strong>티커 전환:</strong> 미국 종목 실시간 차트 조회</li>
+              </ul>
+            </div>
+            <button type="button" class="st-btn st-hv-press" data-goto="chart">종목 차트 열기 →</button>
+          </article>
 
-        <!-- ③ 기업 분석 -->
-        <article class="st-card st-hv-lift">
-          <div>
-            <div class="st-ico">🏢</div>
-            <h2 class="st-h">③ 기업 분석</h2>
-            <ul class="st-list">
-              <li><strong>밸류에이션:</strong> 시총, PER, PBR, ROE, EPS, 배당</li>
-              <li><strong>실적 추이:</strong> 분기·연간 매출 및 영업이익률</li>
-              <li><strong>경쟁사 비교:</strong> 동종 업계 멀티플·수익률 표</li>
-            </ul>
-          </div>
-          <a class="st-btn st-hv-press" href="company.html">기업 분석 열기 →</a>
-        </article>
+          <article class="st-card st-hv-lift">
+            <div>
+              <div class="st-ico">🏢</div>
+              <h2 class="st-h">③ 기업 분석</h2>
+              <ul class="st-list">
+                <li><strong>밸류에이션:</strong> 시가총액, P/E, P/B, EPS, 배당</li>
+                <li><strong>재무제표:</strong> 분기·연간 매출 및 순이익 추이</li>
+                <li><strong>실적 비교:</strong> 기업 펀더멘털 데이터 조회</li>
+              </ul>
+            </div>
+            <button type="button" class="st-btn st-hv-press" data-goto="company">기업 분석 열기 →</button>
+          </article>
 
-        <!-- ④ 목표가 알림 -->
-        <article class="st-card st-hv-lift">
-          <div>
-            <div class="st-ico">🔔</div>
-            <h2 class="st-h">④ 목표가 · 알림</h2>
-            <ul class="st-list">
-              <li><strong>도달 현황:</strong> 전체 알림, 임박(±3%), 완료 건수</li>
-              <li><strong>활성 리스트:</strong> 목표가 괴리율(%) 게이지 바</li>
-              <li><strong>알림 로그:</strong> 도달 시간·체결가 기록 및 차트 연동</li>
-            </ul>
-          </div>
-          <a class="st-btn st-hv-press" href="goal.html">목표가 알림 열기 →</a>
-        </article>
+          <article class="st-card st-hv-lift">
+            <div>
+              <div class="st-ico">🔔</div>
+              <h2 class="st-h">④ 목표가 알림</h2>
+              <ul class="st-list">
+                <li><strong>도달 현황:</strong> 전체 알림, 임박(±3%), 완료 건수</li>
+                <li><strong>달러 목표가:</strong> 목표가까지 괴리율(%) 게이지 바</li>
+                <li><strong>알림 관리:</strong> 목표가 등록·삭제 및 차트 이동</li>
+              </ul>
+            </div>
+            <button type="button" class="st-btn st-hv-press" data-goto="goal">목표가 알림 열기 →</button>
+          </article>
+        </div>
+      </section>
+    </div>
 
-      </div>
-    </section>
+    <!-- ================= [VIEW 1: 미국 시장] ================= -->
+    <div class="view-panel" id="view-market">
+      <section class="st-sec live-box">
+        <h2 class="st-h">🇺🇸 ① 미국 시장 현황 (지수 · 국채 · 환율)</h2>
+        <div id="marketOverviewWidget" style="height:420px;width:100%;"></div>
+      </section>
+      <section class="st-sec live-box">
+        <h3 class="st-h" style="font-size:1.15rem">🔥 S&P 500 섹터·종목 히트맵</h3>
+        <div id="heatmapWidget" style="height:420px;width:100%;"></div>
+      </section>
+    </div>
+
+    <!-- ================= [VIEW 2: 종목 차트] ================= -->
+    <div class="view-panel" id="view-chart">
+      <section class="st-sec live-box">
+        <div class="live-head">
+          <h2 class="st-h" style="margin:0">📈 ② 미국 종목 실시간 차트</h2>
+          <button type="button" class="st-btn" style="margin:0;padding:8px 14px;font-size:.85rem" data-goto="goal">+ 이 종목 목표가 등록</button>
+        </div>
+        <div id="tvChartContainer" style="height:480px;width:100%;"></div>
+      </section>
+
+      <section class="st-sec live-box">
+        <h3 class="st-h" style="font-size:1.15rem">🧭 기술적 지표 요약 (Technical Analysis)</h3>
+        <div id="techAnalysisWidget" style="height:380px;width:100%;"></div>
+      </section>
+    </div>
+
+    <!-- ================= [VIEW 3: 기업 분석] ================= -->
+    <div class="view-panel" id="view-company">
+      <section class="st-sec live-box">
+        <h2 class="st-h">🏢 ③ 미국 기업 재무 및 밸류에이션</h2>
+        <p class="st-p" style="font-size:.88rem;color:#666">상단 검색창에서 미국 종목을 선택하면 해당 기업의 재무 실적과 밸류에이션 지표가 표시됩니다.</p>
+        <div id="fundamentalWidget" style="height:520px;width:100%;"></div>
+      </section>
+    </div>
+
+    <!-- ================= [VIEW 4: 목표가 알림] ================= -->
+    <div class="view-panel" id="view-goal">
+      <section class="st-sec live-box">
+        <h2 class="st-h">🔔 ④ 미국 주식 목표가 알림 (USD 기준)</h2>
+
+        <div class="kpi-grid" id="goalKpiGrid">
+          <div class="kpi-box"><div class="kpi-title">전체 설정 알림</div><div class="kpi-val" id="kpiTotal">0건</div></div>
+          <div class="kpi-box"><div class="kpi-title">목표가 임박 (±3% 이내)</div><div class="kpi-val" style="color:#d97706" id="kpiNear">0건</div></div>
+          <div class="kpi-box"><div class="kpi-title">목표가 도달 완료</div><div class="kpi-val" style="color:#10b981" id="kpiDone">0건</div></div>
+        </div>
+
+        <form id="goalForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:18px;background:#f8f9fa;padding:14px;border-radius:12px;">
+          <input type="text" id="gName" class="search-input" placeholder="종목명 (예: 엔비디아)" required>
+          <input type="text" id="gSym" class="search-input" placeholder="티커 (예: NASDAQ:NVDA)" required>
+          <input type="number" id="gCur" class="search-input" placeholder="현재가 ($)" step="any" required>
+          <input type="number" id="gTarget" class="search-input" placeholder="목표가 ($)" step="any" required>
+          <input type="text" id="gMemo" class="search-input" placeholder="메모 (예: 분할 매수)">
+          <button type="submit" class="search-submit">알림 등록</button>
+        </form>
+
+        <h3 class="st-h" style="font-size:1.1rem">활성 목표가 리스트 (종목명 클릭 시 차트로 이동)</h3>
+        <div id="goalList"></div>
+      </section>
+    </div>
   </main>
 
   <footer class="st-foot">
-    글로벌 주식 분석 대시보드 · 시장 현황 / 종목 차트 / 기업 분석 / 목표가 알림
+    미국 주식 분석 대시보드 · 미국 시장 / 종목 차트 / 기업 분석 / 목표가 알림
   </footer>
 
-  <!-- 전 세계 종목 검색 및 실시간 차트 제어 스크립트 -->
   <script>
-    // 한글 별칭 보완 사전 (한국어 입력 시 글로벌 검색 정확도 향상)
-    const KO_ALIAS = {
-      "삼성전자": { sym: "KRX:005930", name: "삼성전자", exch: "KRX · 한국" },
-      "sk하이닉스": { sym: "KRX:000660", name: "SK하이닉스", exch: "KRX · 한국" },
-      "하이닉스": { sym: "KRX:000660", name: "SK하이닉스", exch: "KRX · 한국" },
-      "lg에너지솔루션": { sym: "KRX:373220", name: "LG에너지솔루션", exch: "KRX · 한국" },
-      "현대차": { sym: "KRX:005380", name: "현대차", exch: "KRX · 한국" },
-      "기아": { sym: "KRX:000270", name: "기아", exch: "KRX · 한국" },
-      "네이버": { sym: "KRX:035420", name: "NAVER", exch: "KRX · 한국" },
-      "카카오": { sym: "KRX:035720", name: "카카오", exch: "KRX · 한국" },
-      "코스피": { sym: "KRX:KOSPI", name: "코스피 지수", exch: "KRX · 한국" },
-      "코스닥": { sym: "KRX:KOSDAQ", name: "코스닥 지수", exch: "KRX · 한국" },
-      "엔비디아": { sym: "NASDAQ:NVDA", name: "NVIDIA Corp.", exch: "NASDAQ · 미국" },
-      "애플": { sym: "NASDAQ:AAPL", name: "Apple Inc.", exch: "NASDAQ · 미국" },
-      "테슬라": { sym: "NASDAQ:TSLA", name: "Tesla, Inc.", exch: "NASDAQ · 미국" },
-      "마이크로소프트": { sym: "NASDAQ:MSFT", name: "Microsoft Corp.", exch: "NASDAQ · 미국" },
-      "구글": { sym: "NASDAQ:GOOGL", name: "Alphabet Inc.", exch: "NASDAQ · 미국" },
-      "아마존": { sym: "NASDAQ:AMZN", name: "Amazon.com, Inc.", exch: "NASDAQ · 미국" },
-      "메타": { sym: "NASDAQ:META", name: "Meta Platforms", exch: "NASDAQ · 미국" },
-      "도요타": { sym: "TSE:7203", name: "Toyota Motor Corp.", exch: "TSE · 일본" },
-      "소니": { sym: "TSE:6758", name: "Sony Group Corp.", exch: "TSE · 일본" },
-      "닌텐도": { sym: "TSE:7974", name: "Nintendo Co., Ltd.", exch: "TSE · 일본" },
-      "텐센트": { sym: "HKEX:0700", name: "Tencent Holdings", exch: "HKEX · 홍콩" },
-      "알리바바": { sym: "HKEX:9988", name: "Alibaba Group", exch: "HKEX · 홍콩" },
-      "tsmc": { sym: "NYSE:TSM", name: "Taiwan Semiconductor", exch: "NYSE · 대만/미국" },
-      "루이비통": { sym: "EURONEXT:MC", name: "LVMH Moet Hennessy", exch: "EURONEXT · 프랑스" },
-      "비트코인": { sym: "BINANCE:BTCUSDT", name: "Bitcoin / USDT", exch: "CRYPTO" }
+    // 미국 주요 종목 한글 별칭 -> 거래소:티커 매핑
+    const US_KO_ALIAS = {
+      "엔비디아": { sym: "NASDAQ:NVDA", name: "엔비디아 (NVDA)", exch: "NASDAQ" },
+      "애플": { sym: "NASDAQ:AAPL", name: "애플 (AAPL)", exch: "NASDAQ" },
+      "테슬라": { sym: "NASDAQ:TSLA", name: "테슬라 (TSLA)", exch: "NASDAQ" },
+      "마이크로소프트": { sym: "NASDAQ:MSFT", name: "마이크로소프트 (MSFT)", exch: "NASDAQ" },
+      "구글": { sym: "NASDAQ:GOOGL", name: "알파벳 A (GOOGL)", exch: "NASDAQ" },
+      "알파벳": { sym: "NASDAQ:GOOGL", name: "알파벳 A (GOOGL)", exch: "NASDAQ" },
+      "아마존": { sym: "NASDAQ:AMZN", name: "아마존 (AMZN)", exch: "NASDAQ" },
+      "메타": { sym: "NASDAQ:META", name: "메타 플랫폼스 (META)", exch: "NASDAQ" },
+      "넷플릭스": { sym: "NASDAQ:NFLX", name: "넷플릭스 (NFLX)", exch: "NASDAQ" },
+      "브로드컴": { sym: "NASDAQ:AVGO", name: "브로드컴 (AVGO)", exch: "NASDAQ" },
+      "팔란티어": { sym: "NYSE:PLTR", name: "팔란티어 (PLTR)", exch: "NYSE" },
+      "코카콜라": { sym: "NYSE:KO", name: "코카콜라 (KO)", exch: "NYSE" },
+      "스타벅스": { sym: "NASDAQ:SBUX", name: "스타벅스 (SBUX)", exch: "NASDAQ" },
+      "나이키": { sym: "NYSE:NKE", name: "나이키 (NKE)", exch: "NYSE" },
+      "일라이릴리": { sym: "NYSE:LLY", name: "일라이 릴리 (LLY)", exch: "NYSE" },
+      "jp모건": { sym: "NYSE:JPM", name: "JP모건 (JPM)", exch: "NYSE" },
+      "버크셔": { sym: "NYSE:BRK.B", name: "버크셔 해서웨이 B (BRK.B)", exch: "NYSE" }
     };
 
-    // Yahoo Finance 글로벌 심볼을 TradingView 심볼로 변환
-    function toTradingViewSymbol(quote) {
-      const sym = quote.symbol || "";
-      const exch = (quote.exchange || "").toUpperCase();
+    const US_EXCHANGES = new Set(["NMS", "NGM", "NCM", "NAS", "NYQ", "NYS", "ASE", "PCX", "BTS", "NASDAQ", "NYSE", "AMEX"]);
 
-      // 한국 (.KS: 코스피 -> KRX, .KQ: 코스닥 -> KRX)
-      if (sym.endsWith(".KS") || sym.endsWith(".KQ")) {
-        return "KRX:" + sym.split(".")[0];
+    let currentStock = { symbol: "NASDAQ:NVDA", name: "엔비디아 (NVDA)" };
+    let currentView = "home";
+    let watchlist = JSON.parse(localStorage.getItem("myUsWatchlist") || "[]");
+    let goals = JSON.parse(localStorage.getItem("myUsStockGoals") || JSON.stringify([
+      { id: 1, name: "엔비디아", sym: "NASDAQ:NVDA", cur: 138.5, target: 145.0, memo: "저항선 돌파 목표", time: "2026-11-26 01:30" },
+      { id: 2, name: "애플", sym: "NASDAQ:AAPL", cur: 230.0, target: 230.0, memo: "목표가 도달 완료", time: "2026-11-25 23:10" }
+    ]));
+
+    function toUsTradingViewSymbol(quote) {
+      const sym = (quote.symbol || "").toUpperCase();
+      const exch = (quote.exchange || "").toUpperCase();
+      // 해외 접미사(.KS, .T, .HK, .DE 등)가 붙은 종목은 미국 주식 대상에서 제외
+      if (!sym || sym.includes(".") && !sym.endsWith(".B") && !sym.endsWith(".A")) {
+        if (sym.includes(".")) return null;
       }
-      // 일본 (.T -> TSE)
-      if (sym.endsWith(".T")) {
-        return "TSE:" + sym.split(".")[0];
-      }
-      // 홍콩 (.HK -> HKEX, 4자리 패딩)
-      if (sym.endsWith(".HK")) {
-        const code = sym.split(".")[0].padStart(4, "0");
-        return "HKEX:" + code;
-      }
-      // 대만 (.TW -> TWSE)
-      if (sym.endsWith(".TW")) {
-        return "TWSE:" + sym.split(".")[0];
-      }
-      // 런던 (.L -> LSE)
-      if (sym.endsWith(".L")) {
-        return "LSE:" + sym.split(".")[0];
-      }
-      // 독일 프랑크푸르트 (.DE -> XETR)
-      if (sym.endsWith(".DE")) {
-        return "XETR:" + sym.split(".")[0];
-      }
-      // 파리/암스테르담 (.PA, .AS -> EURONEXT)
-      if (sym.endsWith(".PA") || sym.endsWith(".AS")) {
-        return "EURONEXT:" + sym.split(".")[0];
-      }
-      // 토론토 (.TO -> TSX)
-      if (sym.endsWith(".TO")) {
-        return "TSX:" + sym.split(".")[0];
-      }
-      // 호주 (.AX -> ASX)
-      if (sym.endsWith(".AX")) {
-        return "ASX:" + sym.split(".")[0];
-      }
-      // 인도 (.NS -> NSE, .BO -> BSE)
-      if (sym.endsWith(".NS")) {
-        return "NSE:" + sym.split(".")[0];
-      }
-      if (sym.endsWith(".BO")) {
-        return "BSE:" + sym.split(".")[0];
-      }
-      // 상하이/선전 (.SS -> SSE, .SZ -> SZSE)
-      if (sym.endsWith(".SS")) {
-        return "SSE:" + sym.split(".")[0];
-      }
-      if (sym.endsWith(".SZ")) {
-        return "SZSE:" + sym.split(".")[0];
-      }
-      // 미국 거래소 매핑
-      if (exch === "NMS" || exch === "NGM" || exch === "NCM" || exch === "NAS") {
-        return "NASDAQ:" + sym;
-      }
-      if (exch === "NYQ" || exch === "NYS") {
-        return "NYSE:" + sym;
-      }
-      if (exch === "ASE" || exch === "PCX" || exch === "BTS") {
-        return "AMEX:" + sym;
-      }
-      // 암호화폐 (-USD)
-      if (sym.endsWith("-USD")) {
-        return "COINBASE:" + sym.replace("-", "");
-      }
-      return sym;
+      if (exch === "NMS" || exch === "NGM" || exch === "NCM" || exch === "NAS") return "NASDAQ:" + sym;
+      if (exch === "NYQ" || exch === "NYS") return "NYSE:" + sym;
+      if (exch === "ASE" || exch === "PCX" || exch === "BTS") return "AMEX:" + sym;
+      if (US_EXCHANGES.has(exch)) return exch + ":" + sym;
+      return null;
     }
 
-    let currentStock = { symbol: "KRX:KOSPI", name: "코스피" };
-    let watchlist = JSON.parse(localStorage.getItem("myGlobalWatchlist") || "[]");
-    let searchTimer = null;
+    function switchView(viewName) {
+      currentView = viewName;
+      document.querySelectorAll(".view-panel").forEach(p => {
+        p.classList.toggle("is-active", p.id === `view-${viewName}`);
+      });
+      document.querySelectorAll("#mainNav .st-nav-a").forEach(btn => {
+        btn.classList.toggle("is-on", btn.dataset.view === viewName);
+      });
 
-    const inputEl = document.getElementById("stockSearchInput");
-    const acListEl = document.getElementById("acList");
+      if (viewName === "market") renderMarketWidgets();
+      if (viewName === "chart") renderChartWidgets();
+      if (viewName === "company") renderCompanyWidget();
+      if (viewName === "goal") {
+        document.getElementById("gName").value = currentStock.name;
+        document.getElementById("gSym").value = currentStock.symbol;
+        renderGoals();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-    function loadTVChart(symbol, name) {
-      currentStock = { symbol, name: name || symbol };
-      document.getElementById("activeSymLabel").textContent = `현재 종목: ${currentStock.name} (${currentStock.symbol})`;
-      acListEl.classList.remove("is-open");
+    document.getElementById("mainNav").addEventListener("click", e => {
+      const btn = e.target.closest("[data-view]");
+      if (btn) switchView(btn.dataset.view);
+    });
+    document.addEventListener("click", e => {
+      const gotoBtn = e.target.closest("[data-goto]");
+      if (gotoBtn) switchView(gotoBtn.dataset.goto);
+    });
 
-      const container = document.getElementById("tvChartContainer");
-      container.innerHTML = "";
+    function injectTVWidget(containerId, scriptUrl, configObj) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = "";
       const script = document.createElement("script");
-      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+      script.src = scriptUrl;
       script.type = "text/javascript";
       script.async = true;
-      script.innerHTML = JSON.stringify({
+      script.innerHTML = JSON.stringify(configObj);
+      el.appendChild(script);
+    }
+
+    let marketLoaded = false;
+    function renderMarketWidgets() {
+      if (marketLoaded) return;
+      marketLoaded = true;
+      injectTVWidget("marketOverviewWidget", "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js", {
+        colorTheme: "light",
+        dateRange: "12M",
+        showChart: true,
+        locale: "kr",
+        width: "100%",
+        height: "100%",
+        tabs: [
+          {
+            title: "미국 지수·금리",
+            symbols: [
+              { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
+              { s: "NASDAQ:NDX", d: "나스닥 100" },
+              { s: "DJ:DJI", d: "다우존스" },
+              { s: "TVC:US10Y", d: "미 10년물 국채" },
+              { s: "FX_IDC:USDKRW", d: "원/달러 환율" }
+            ]
+          },
+          {
+            title: "미국 메가캡",
+            symbols: [
+              { s: "NASDAQ:NVDA", d: "엔비디아" },
+              { s: "NASDAQ:AAPL", d: "애플" },
+              { s: "NASDAQ:MSFT", d: "마이크로소프트" },
+              { s: "NASDAQ:TSLA", d: "테슬라" }
+            ]
+          }
+        ]
+      });
+
+      injectTVWidget("heatmapWidget", "https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js", {
+        exchanges: [],
+        dataSource: "SPX500",
+        grouping: "sector",
+        blockSize: "market_cap_basic",
+        blockColor: "change",
+        locale: "kr",
+        colorTheme: "light",
+        hasTopBar: false,
+        isDataSetEnabled: false,
+        isZoomEnabled: true,
+        hasSymbolTooltip: true,
+        width: "100%",
+        height: "100%"
+      });
+    }
+
+    function renderChartWidgets() {
+      injectTVWidget("tvChartContainer", "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", {
         autosize: true,
         symbol: currentStock.symbol,
         interval: "D",
-        timezone: "Asia/Seoul",
+        timezone: "America/New_York",
         theme: "light",
         style: "1",
         locale: "kr",
         enable_publishing: false,
         allow_symbol_change: true,
-        calendar: false,
         support_host: "https://www.tradingview.com"
       });
-      container.appendChild(script);
 
-      updateActiveButtons();
-      updateFavButtonState();
+      injectTVWidget("techAnalysisWidget", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
+        interval: "1D",
+        width: "100%",
+        isTransparent: false,
+        height: "100%",
+        symbol: currentStock.symbol,
+        showIntervalTabs: true,
+        displayMode: "single",
+        locale: "kr",
+        colorTheme: "light"
+      });
     }
 
-    // 전 세계 종목 실시간 자동완성 조회
-    async function searchGlobalStocks(query) {
-      const q = query.trim();
-      if (!q) {
-        acListEl.classList.remove("is-open");
-        return;
+    function renderCompanyWidget() {
+      injectTVWidget("fundamentalWidget", "https://s3.tradingview.com/external-embedding/embed-widget-financials.js", {
+        isTransparent: false,
+        largeChartUrl: "",
+        displayMode: "regular",
+        width: "100%",
+        height: "100%",
+        colorTheme: "light",
+        symbol: currentStock.symbol,
+        locale: "kr"
+      });
+    }
+
+    function selectStock(symbol, name, autoOpenChart = true) {
+      currentStock = { symbol, name: name || symbol };
+      document.getElementById("activeSymLabel").textContent = `현재 종목: ${currentStock.name} (${currentStock.symbol})`;
+      document.getElementById("acList").classList.remove("is-open");
+
+      document.querySelectorAll(".sym-btn").forEach(btn => {
+        btn.classList.toggle("is-on", btn.dataset.sym === currentStock.symbol);
+      });
+      updateFavButtonState();
+
+      if (autoOpenChart && currentView !== "company" && currentView !== "goal") {
+        switchView("chart");
+      } else {
+        if (currentView === "chart") renderChartWidgets();
+        if (currentView === "company") renderCompanyWidget();
       }
+    }
+
+    const inputEl = document.getElementById("stockSearchInput");
+    const acListEl = document.getElementById("acList");
+    let searchTimer = null;
+
+    async function searchUsStocks(query) {
+      const q = query.trim();
+      if (!q) { acListEl.classList.remove("is-open"); return; }
 
       const results = [];
       const lower = q.toLowerCase();
 
-      // 1) 한글 별칭 매칭 우선 추가
-      Object.keys(KO_ALIAS).forEach(key => {
-        if (key.includes(lower) || KO_ALIAS[key].name.toLowerCase().includes(lower)) {
+      Object.keys(US_KO_ALIAS).forEach(k => {
+        if (k.includes(lower) || US_KO_ALIAS[k].name.toLowerCase().includes(lower) || US_KO_ALIAS[k].sym.toLowerCase().includes(lower)) {
           results.push({
-            tvSym: KO_ALIAS[key].sym,
-            name: KO_ALIAS[key].name,
-            sub: `${KO_ALIAS[key].sym} · ${KO_ALIAS[key].exch}`,
-            type: "추천 매칭"
+            tvSym: US_KO_ALIAS[k].sym,
+            name: US_KO_ALIAS[k].name,
+            sub: `${US_KO_ALIAS[k].sym} · ${US_KO_ALIAS[k].exch}`,
+            type: "미국 종목"
           });
         }
       });
 
-      // 2) 6자리 한국 종목코드 직접 입력 대응
-      if (/^\d{6}$/.test(q)) {
-        results.push({
-          tvSym: `KRX:${q}`,
-          name: `한국 상장종목 (${q})`,
-          sub: `KRX:${q} · 한국거래소`,
-          type: "KRX 코드"
-        });
-      }
-
-      acListEl.innerHTML = '<div class="ac-status">전 세계 거래소 검색 중...</div>';
+      acListEl.innerHTML = '<div class="ac-status">미국 주식 검색 중...</div>';
       acListEl.classList.add("is-open");
 
       try {
@@ -425,53 +526,26 @@ main{max-width:960px;margin:0 auto;padding:16px}
 
         if (data && Array.isArray(data.quotes)) {
           data.quotes.forEach(item => {
-            if (!item.symbol) return;
-            const tvSym = toTradingViewSymbol(item);
-            // 중복 제거
-            if (results.some(r => r.tvSym === tvSym)) return;
-
-            const dispName = item.shortname || item.longname || item.symbol;
-            const exchName = item.exchDisp || item.exchange || "";
-            const qType = item.typeDisp || item.quoteType || "STOCK";
-
+            const tvSym = toUsTradingViewSymbol(item);
+            if (!tvSym || results.some(r => r.tvSym === tvSym)) return;
             results.push({
-              tvSym: tvSym,
-              name: dispName,
-              sub: `${tvSym} (원본: ${item.symbol}) · ${exchName}`,
-              type: qType
+              tvSym,
+              name: item.shortname || item.longname || item.symbol,
+              sub: `${tvSym} · ${item.exchDisp || item.exchange || "US"}`,
+              type: item.typeDisp || "US EQUITY"
             });
           });
         }
-      } catch (err) {
-        // 네트워크 제한 시에도 사용자가 입력한 티커로 바로 조회 가능하도록 폴백 제공
-        if (results.length === 0) {
-          const fallbackSym = q.includes(":") ? q.toUpperCase() : q.toUpperCase();
-          results.push({
-            tvSym: fallbackSym,
-            name: fallbackSym,
-            sub: `${fallbackSym} 심볼로 차트 바로 열기`,
-            type: "직접 입력"
-          });
-        }
-      }
+      } catch (e) {}
 
-      renderAutocomplete(results, q);
-    }
-
-    function renderAutocomplete(results, rawQuery) {
       acListEl.innerHTML = "";
       if (results.length === 0) {
-        const directSym = rawQuery.trim().toUpperCase();
+        const upper = q.toUpperCase();
+        const directSym = upper.includes(":") ? upper : `NASDAQ:${upper}`;
         const div = document.createElement("div");
         div.className = "ac-item";
-        div.innerHTML = `
-          <div class="ac-main">
-            <span class="ac-name">"${directSym}" 심볼로 직접 조회</span>
-            <span class="ac-sub">차트 내부 검색창(🔍)에서도 전 세계 모든 종목을 찾을 수 있습니다.</span>
-          </div>
-          <span class="ac-tag">직접 실행</span>
-        `;
-        div.addEventListener("click", () => loadTVChart(directSym, directSym));
+        div.innerHTML = `<div class="ac-main"><span class="ac-name">"${directSym}" 미국 티커로 열기</span><span class="ac-sub">NYSE 종목인 경우 차트 창에서 NYSE:${upper}로 변경할 수 있습니다.</span></div><span class="ac-tag">직접 입력</span>`;
+        div.addEventListener("click", () => selectStock(directSym, upper, true));
         acListEl.appendChild(div);
         return;
       }
@@ -479,38 +553,55 @@ main{max-width:960px;margin:0 auto;padding:16px}
       results.forEach(item => {
         const div = document.createElement("div");
         div.className = "ac-item";
-        div.innerHTML = `
-          <div class="ac-main">
-            <span class="ac-name">${item.name}</span>
-            <span class="ac-sub">${item.sub}</span>
-          </div>
-          <span class="ac-tag">${item.type}</span>
-        `;
+        div.innerHTML = `<div class="ac-main"><span class="ac-name">${item.name}</span><span class="ac-sub">${item.sub}</span></div><span class="ac-tag">${item.type}</span>`;
         div.addEventListener("click", () => {
           inputEl.value = item.name;
-          loadTVChart(item.tvSym, item.name);
+          selectStock(item.tvSym, item.name, true);
         });
         acListEl.appendChild(div);
       });
     }
 
-    function updateActiveButtons() {
-      document.querySelectorAll(".sym-btn").forEach(btn => {
-        btn.classList.toggle("is-on", btn.dataset.sym === currentStock.symbol);
-      });
-    }
+    inputEl.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => searchUsStocks(inputEl.value), 300);
+    });
+
+    document.getElementById("stockSearchForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const first = acListEl.querySelector(".ac-item");
+      if (first && acListEl.classList.contains("is-open")) { first.click(); return; }
+      const raw = inputEl.value.trim();
+      if (!raw) return;
+      const lower = raw.toLowerCase();
+      if (US_KO_ALIAS[lower]) {
+        selectStock(US_KO_ALIAS[lower].sym, US_KO_ALIAS[lower].name, true);
+      } else {
+        const upper = raw.toUpperCase();
+        selectStock(upper.includes(":") ? upper : `NASDAQ:${upper}`, upper, true);
+      }
+    });
+
+    document.addEventListener("click", e => {
+      if (!document.getElementById("searchWrap").contains(e.target)) acListEl.classList.remove("is-open");
+    });
+
+    document.getElementById("presetBtns").addEventListener("click", e => {
+      const btn = e.target.closest(".sym-btn");
+      if (btn) selectStock(btn.dataset.sym, btn.dataset.name, true);
+    });
 
     function updateFavButtonState() {
-      const favBtn = document.getElementById("favToggleBtn");
-      const exists = watchlist.some(item => item.symbol === currentStock.symbol);
-      favBtn.classList.toggle("is-fav", exists);
-      favBtn.textContent = exists ? "★ 관심 등록됨" : "☆ 관심 추가";
+      const btn = document.getElementById("favToggleBtn");
+      const exists = watchlist.some(w => w.symbol === currentStock.symbol);
+      btn.classList.toggle("is-fav", exists);
+      btn.textContent = exists ? "★ 관심 등록됨" : "☆ 관심 추가";
     }
 
     function renderWatchlist() {
       const wrap = document.getElementById("watchlistItems");
       if (watchlist.length === 0) {
-        wrap.innerHTML = '<span style="color:#888;">아직 추가된 관심종목이 없습니다.</span>';
+        wrap.innerHTML = '<span style="color:#888;">아직 추가된 미국 관심종목이 없습니다.</span>';
         return;
       }
       wrap.innerHTML = "";
@@ -519,69 +610,86 @@ main{max-width:960px;margin:0 auto;padding:16px}
         btn.type = "button";
         btn.className = "sym-btn" + (item.symbol === currentStock.symbol ? " is-on" : "");
         btn.dataset.sym = item.symbol;
-        btn.dataset.name = item.name;
         btn.textContent = `★ ${item.name}`;
-        btn.addEventListener("click", () => loadTVChart(item.symbol, item.name));
+        btn.addEventListener("click", () => selectStock(item.symbol, item.name, true));
         wrap.appendChild(btn);
       });
     }
 
-    // 입력 시 실시간 디바운스 검색
-    inputEl.addEventListener("input", function() {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => searchGlobalStocks(inputEl.value), 300);
-    });
-
-    // 검색 버튼/엔터 제출 시 첫 번째 결과 또는 입력 심볼로 즉시 로드
-    document.getElementById("stockSearchForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const firstItem = acListEl.querySelector(".ac-item");
-      if (firstItem && acListEl.classList.contains("is-open")) {
-        firstItem.click();
-        return;
-      }
-      const raw = inputEl.value.trim();
-      if (!raw) return;
-      const lower = raw.toLowerCase();
-      if (KO_ALIAS[lower]) {
-        loadTVChart(KO_ALIAS[lower].sym, KO_ALIAS[lower].name);
-      } else if (/^\d{6}$/.test(raw)) {
-        loadTVChart(`KRX:${raw}`, raw);
-      } else {
-        loadTVChart(raw.toUpperCase(), raw.toUpperCase());
-      }
-    });
-
-    // 검색창 바깥 클릭 시 자동완성 닫기
-    document.addEventListener("click", function(e) {
-      if (!document.getElementById("searchWrap").contains(e.target)) {
-        acListEl.classList.remove("is-open");
-      }
-    });
-
-    // 대표 종목 클릭
-    document.getElementById("presetBtns").addEventListener("click", function(e) {
-      const btn = e.target.closest(".sym-btn");
-      if (!btn) return;
-      loadTVChart(btn.dataset.sym, btn.dataset.name);
-    });
-
-    // 관심종목 추가/해제
-    document.getElementById("favToggleBtn").addEventListener("click", function() {
-      const idx = watchlist.findIndex(item => item.symbol === currentStock.symbol);
-      if (idx >= 0) {
-        watchlist.splice(idx, 1);
-      } else {
-        watchlist.push({ symbol: currentStock.symbol, name: currentStock.name });
-      }
-      localStorage.setItem("myGlobalWatchlist", JSON.stringify(watchlist));
+    document.getElementById("favToggleBtn").addEventListener("click", () => {
+      const idx = watchlist.findIndex(w => w.symbol === currentStock.symbol);
+      if (idx >= 0) watchlist.splice(idx, 1);
+      else watchlist.push({ ...currentStock });
+      localStorage.setItem("myUsWatchlist", JSON.stringify(watchlist));
       renderWatchlist();
       updateFavButtonState();
     });
 
-    // 초기 실행
+    function renderGoals() {
+      const listEl = document.getElementById("goalList");
+      let nearCnt = 0, doneCnt = 0;
+      listEl.innerHTML = "";
+
+      goals.forEach(g => {
+        const gapPct = ((g.target - g.cur) / g.cur) * 100;
+        const absGap = Math.abs(gapPct);
+        const isDone = absGap === 0 || (g.cur >= g.target && g.target > 0 && absGap < 0.01);
+        const isNear = !isDone && absGap <= 3;
+        if (isDone) doneCnt++;
+        if (isNear) nearCnt++;
+
+        const progress = Math.max(5, Math.min(100, 100 - absGap * 5));
+        const div = document.createElement("div");
+        div.className = "goal-item";
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div>
+              <strong style="font-size:1rem;cursor:pointer;color:var(--st-accent);" class="goal-link">${g.name} (${g.sym}) ↗</strong>
+              <span style="font-size:.8rem;margin-left:6px;padding:2px 8px;border-radius:6px;background:${isDone ? '#d1fae5' : isNear ? '#fef3c7' : '#f1f3f5'};color:${isDone ? '#065f46' : isNear ? '#92400e' : '#444'};font-weight:700;">
+                ${isDone ? '도달 완료' : isNear ? '임박 (±3%)' : `괴리율 ${gapPct > 0 ? '+' : ''}${gapPct.toFixed(2)}%`}
+              </span>
+            </div>
+            <button type="button" class="del-btn" data-id="${g.id}">삭제</button>
+          </div>
+          <div style="font-size:.88rem;color:#555;margin-top:6px;">
+            현재가: <strong>$${Number(g.cur).toLocaleString()}</strong> / 목표가: <strong>$${Number(g.target).toLocaleString()}</strong> · 메모: ${g.memo || '-'} (${g.time})
+          </div>
+          <div class="goal-bar"><i style="width:${progress}%"></i></div>
+        `;
+        div.querySelector(".goal-link").addEventListener("click", () => selectStock(g.sym, g.name, true));
+        div.querySelector(".del-btn").addEventListener("click", () => {
+          goals = goals.filter(item => item.id !== g.id);
+          localStorage.setItem("myUsStockGoals", JSON.stringify(goals));
+          renderGoals();
+        });
+        listEl.appendChild(div);
+      });
+
+      document.getElementById("kpiTotal").textContent = `${goals.length}건`;
+      document.getElementById("kpiNear").textContent = `${nearCnt}건`;
+      document.getElementById("kpiDone").textContent = `${doneCnt}건`;
+    }
+
+    document.getElementById("goalForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const now = new Date().toISOString().slice(0, 16).replace("T", " ");
+      const rawSym = document.getElementById("gSym").value.trim().toUpperCase();
+      goals.unshift({
+        id: Date.now(),
+        name: document.getElementById("gName").value.trim(),
+        sym: rawSym.includes(":") ? rawSym : `NASDAQ:${rawSym}`,
+        cur: parseFloat(document.getElementById("gCur").value),
+        target: parseFloat(document.getElementById("gTarget").value),
+        memo: document.getElementById("gMemo").value.trim(),
+        time: now
+      });
+      localStorage.setItem("myUsStockGoals", JSON.stringify(goals));
+      e.target.reset();
+      renderGoals();
+    });
+
     renderWatchlist();
-    loadTVChart(currentStock.symbol, currentStock.name);
+    updateFavButtonState();
   </script>
 
 </body></html>
